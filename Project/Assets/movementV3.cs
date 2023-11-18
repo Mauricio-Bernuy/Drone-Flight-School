@@ -69,7 +69,7 @@ public class MoveObjectV3 : MonoBehaviour
         //}
 
         // PRENDER APAGAR DRON controller
-        if (OVRInput.Get(OVRInput.Button.One)){
+        if (OVRInput.Get(OVRInput.Button.One)){ 
             droneOn = !droneOn;
             if (droneOn)
                 forcedir = new Vector3(0, gravConst, 0);
@@ -78,10 +78,10 @@ public class MoveObjectV3 : MonoBehaviour
             cForce.force = forcedir;
         }
         
-
         if (!droneOn){
             return;
         }
+        
         if (!controller.GetComponent<OVRGrabbable>().isGrabbed){
             return;
         }
