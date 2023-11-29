@@ -5,6 +5,12 @@ using UnityEngine.SceneManagement;
 using System;
 using Oculus.Interaction;
 
+
+using UnityEngine;
+using System.Collections;
+
+
+
 public class MoveObjectV3 : MonoBehaviour
 {
     public float speed = 5f;
@@ -23,6 +29,15 @@ public class MoveObjectV3 : MonoBehaviour
     private float gravConst = 9.81f;
     private bool droneOn = true;
     
+    public Animator animFL;
+    public Animator animFR;
+    public Animator animBL;
+    public Animator animBR;
+
+    public float speedFL;
+    public float speedFR;
+    public float speedBL;
+    public float speedBR;
     
     public GameObject controller;
     
@@ -38,7 +53,12 @@ public class MoveObjectV3 : MonoBehaviour
         forcedir = new Vector3(0, gravConst, 0);
         cForce.force = forcedir;
         rb = GetComponent<Rigidbody>();
-        prevAngularDrag = rb.angularDrag;            
+        prevAngularDrag = rb.angularDrag;      
+
+        animFL = transform.Find("drone/Fans/fan.FL").GetComponent<Animator>();
+        animFR = transform.Find("drone/Fans/fan.FR").GetComponent<Animator>();
+        animBL = transform.Find("drone/Fans/fan.BL").GetComponent<Animator>();
+        animBR = transform.Find("drone/Fans/fan.BR").GetComponent<Animator>();
     }
 
     public IEnumerator AngularDecelerate()
@@ -87,6 +107,19 @@ public class MoveObjectV3 : MonoBehaviour
             }
         }
         
+        // BASE FAN SPEED
+        if(droneOn){
+            animFL.speed = 2F; 
+            animFR.speed = 2F; 
+            animBL.speed = 2F; 
+            animBR.speed = 2F; 
+        }
+        else{
+            animFL.speed = 0F; 
+            animFR.speed = 0F; 
+            animBL.speed = 0F; 
+            animBR.speed = 0F; 
+        }
 
         //* MANTAIN UPRIGHT        
         if (droneOn){
@@ -94,6 +127,7 @@ public class MoveObjectV3 : MonoBehaviour
             rb.AddTorque(new Vector3(rot.x, rot.y, rot.z)*uprightStrength);
         }
 
+        //* CONTROLLER CONTROLS
         if (droneOn){
             if (grabbedL){
                 // ROTATION CONTROLLER
@@ -101,9 +135,15 @@ public class MoveObjectV3 : MonoBehaviour
                     Vector2 val = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
                     rb.angularDrag = prevAngularDrag;       
                     rb.AddTorque(Vector3.up * speed * 100 * val.x * Math.Abs(val.x) * Time.deltaTime); // al cuadrado
+
+                    // fans
+                    animFL.speed += val.x; 
+                    animFR.speed -= val.x; 
+                    animBL.speed -= val.x; 
+                    animBR.speed += val.x; 
                 }
 
-                if (Input.GetKeyUp(KeyCode.E) || Input.GetKeyUp(KeyCode.Q)){ //|| Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S) || Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D)
+                if (OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick) == new Vector2(0f,0f)){ 
                     StartCoroutine(AngularDecelerate());    
                 }
 
@@ -113,6 +153,13 @@ public class MoveObjectV3 : MonoBehaviour
                     forcedir_cp = forcedir;
                     forcedir_cp.y = forcedir.y + fuerzadetorque * val.y * Math.Abs(val.y) * Math.Abs(val.y) * Math.Abs(val.y);
                     cForce.force = forcedir_cp;
+
+                    // fans
+                    animFL.speed += val.y; 
+                    animFR.speed += val.y; 
+                    animBL.speed += val.y; 
+                    animBR.speed += val.y; 
+
                 }
             } 
 
@@ -135,6 +182,12 @@ public class MoveObjectV3 : MonoBehaviour
                     }
 
                     rb.AddRelativeTorque(new Vector3(0, 0, 2f)*val.y);
+
+                    // fans
+                    animFL.speed -= val.y; 
+                    animFR.speed -= val.y; 
+                    animBL.speed += val.y; 
+                    animBR.speed += val.y; 
                 }
 
                 // LEFT RIGHT CONTROLLER
@@ -154,11 +207,17 @@ public class MoveObjectV3 : MonoBehaviour
                         rb.AddForce( aux* aceleracion * val.x, ForceMode.Force);
                     }
                     rb.AddRelativeTorque(new Vector3(2f, 0, 0)*val.x);
+
+                    // fans
+                    animFL.speed += val.x; 
+                    animFR.speed -= val.x; 
+                    animBL.speed += val.x; 
+                    animBR.speed -= val.x; 
                 }
             }
         }
 
-        //* CONTROLES TECLADO
+        //* KEYBOARD CONTROLS
         if (droneOn){
             //ROTACION
             if (Input.GetKey(KeyCode.E)){
@@ -170,6 +229,9 @@ public class MoveObjectV3 : MonoBehaviour
             if (Input.GetKey(KeyCode.Q)){
                 rb.angularDrag = prevAngularDrag;       
                 rb.AddTorque(-Vector3.up * speed * 100  * Time.deltaTime);
+            }
+            if (Input.GetKeyUp(KeyCode.E) || Input.GetKeyUp(KeyCode.Q) ){ 
+                    StartCoroutine(AngularDecelerate());    
             }
 
             //ELEVACION +
@@ -267,6 +329,10 @@ public class MoveObjectV3 : MonoBehaviour
             }
         }
 
+        speedFL = animFL.speed;
+        speedFR = animFR.speed;
+        speedBL = animBL.speed;
+        speedBR = animBR.speed;
     }
 }
 
