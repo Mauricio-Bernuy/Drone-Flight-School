@@ -40,7 +40,12 @@ namespace Oculus.Interaction
         public InteractorState nextState1 = InteractorState.Normal;
         public float ax;
         
-
+        public GrabInteractor GrabInteractorL;
+        public GrabInteractor GrabInteractorR;
+        public GrabInteractable target;
+        public bool grabbedL = false;
+        public bool grabbedR = false;
+        
         private IInteractorView InteractorView;
 
         protected bool _started = false;
@@ -84,13 +89,19 @@ namespace Oculus.Interaction
         }
 
         void Update(){
-            ax = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger);
-            if(ax != 0f && curState == InteractorState.Hover){
-                // _material.color = _selectColor;
-                isGrabbedState = true;
-            }
-            else if (ax == 0f)
-            { isGrabbedState = false;}
+            if (target == GrabInteractorL.SelectedInteractable)
+                grabbedL = true;
+            else  
+                grabbedL = false;
+            
+            if (target == GrabInteractorR.SelectedInteractable)
+                grabbedR = true;
+            else 
+                grabbedR = false;
+
+            // Check if each hand grabbing~!
+            // grabbedL = GrabInteractorL.SelectedInteractable;
+            // grabbedR = GrabInteractorR.SelectedInteractable;
         }
 
         #region Inject

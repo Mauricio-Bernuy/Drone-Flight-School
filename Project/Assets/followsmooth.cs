@@ -9,20 +9,11 @@ public class followsmooth : MonoBehaviour
     private Vector3 velocity = Vector3.zero;
     public float speed = 4f;
 
+    public MoveObjectV3 dronemove;
+
     void Update()
     {
-        // if(!transform.GetComponent<OVRGrabbable>().isGrabbed){
-        // var grabInteractable = transform.GetComponent<IInteractorView>();
-        // if (grabInteractable == null){
-        //     return;
-        // }
-        // if (InteractorView.State != InteractorState.Select){
-        if (true){
-
-        // if(!transform.GetComponent<OVRGrabbable>().isGrabbed){
-// if (interactable != null && interactable.attachedToHand != null) { ... }
-            // Define a target position above and behind the target transform
-            
+        if (!(dronemove.grabbedL || dronemove.grabbedR)){
             Vector3 targetPosition = target.TransformPoint(new Vector3(0, 0, 0));
 
             // Smoothly move the camera towards that target position
