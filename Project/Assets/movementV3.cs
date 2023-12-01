@@ -26,6 +26,9 @@ public class MoveObjectV3 : MonoBehaviour
     public float angularTurbulence = 0f;
     
     public float prevAngularDrag;
+    public float prevDragX = 0;
+    public float prevDragY = 0;
+    public float prevDragZ = 0;
     private float gravConst = 9.81f;
     private bool droneOn = true;
     
@@ -87,6 +90,17 @@ public class MoveObjectV3 : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         rb.angularDrag = prevAngularDrag;       
     }
+
+
+    // async void droneDecelerate(float x, float y, float z){
+    //     prevDragX = x;
+    //     prevDragY = y;
+    //     prevDragZ = z;
+    //     await Task.Delay(1000); 
+    //     prevDragX = 0;
+    //     prevDragY = 0;
+    //     prevDragZ = 0;
+    // }
 
     async void crashDroneOff()
     {
@@ -220,6 +234,35 @@ public class MoveObjectV3 : MonoBehaviour
 
             droneAudio.pitch += UnityEngine.Random.Range(-turbulence, turbulence) * 0.1f;
             
+            // ASSISTS
+
+            // Vector3 t_velocity = rb.velocity;
+
+            // t_velocity.x *= 1f + prevDragX;
+            // t_velocity.y *= 1f + prevDragY;
+            // t_velocity.z *= 1f + prevDragZ;
+
+            // rb.velocity = t_velocity;
+
+            // if (grabbedL){
+            //     Vector2 valL = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
+            //     if (valL.x == 0f){
+            //         StartCoroutine(AngularDecelerate());    
+            //     }
+                // if (valL.y == 0f){
+                //     droneDecelerate(10f,0f,0f);  
+                // }
+            // }
+            // if (grabbedR){
+            //     Vector2 valR = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
+                // if (valR.x == 0f){
+                //     droneDecelerate(0f,10f,0f);  
+                // }
+            //     if (valR.y == 0f){
+            //         droneDecelerate(0f,0f,10f);  
+            //     }
+            // }
+
             if (grabbedL){
                 // ROTATION CONTROLLER
                 if (OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick) != new Vector2(0f,0f)){
@@ -234,9 +277,6 @@ public class MoveObjectV3 : MonoBehaviour
                     animBR.speed += val.x; 
                 }
 
-                if (OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick) == new Vector2(0f,0f)){ 
-                    StartCoroutine(AngularDecelerate());    
-                }
 
                 // ELEVATION CONTROLLER
                 if (Math.Abs(OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y) != 0.5){
