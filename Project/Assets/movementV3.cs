@@ -101,11 +101,17 @@ public class MoveObjectV3 : MonoBehaviour
         //* TOGGLE ON
         if (Input.GetKeyDown(KeyCode.F)){
             droneOn = !droneOn;
-            if (droneOn)
+            if (droneOn){
                 forcedir = new Vector3(0, gravConst, 0);
-            else
+                droneBeep.pitch = 1F;
+            }
+            else{
                 forcedir = new Vector3(0, 0, 0);        
+                droneBeep.pitch = 0.5F;
+            }
+
             cForce.force = forcedir;
+            droneBeep.Play(0);
         }
 
         //* TOGGLE ON CONTROLLER
@@ -113,11 +119,18 @@ public class MoveObjectV3 : MonoBehaviour
             if (OVRInput.GetDown(OVRInput.Button.One)){ 
                 droneOn = !droneOn;
                 Debug.Log("A button pressed");
-                if (droneOn)
+                if (droneOn){
                     forcedir = new Vector3(0, gravConst, 0);
-                else
-                    forcedir = new Vector3(0, 0, 0);        
+                    droneBeep.pitch = 1F;
+                    droneAudio.pitch = Mathf.Lerp(droneAudio.pitch, 1f, 5f * Time.deltaTime);
+                    droneAudio.volume = Mathf.Lerp(droneAudio.volume, 1f, 5f * Time.deltaTime);
+                }
+                else{
+                    forcedir = new Vector3(0, 0, 0);     
+                    droneBeep.pitch = 0.5F;
+                }
                 cForce.force = forcedir;
+                droneBeep.Play(0);
             }
         }
         
@@ -138,10 +151,12 @@ public class MoveObjectV3 : MonoBehaviour
         if(droneOn){
             droneAudio.pitch = 1F;
             droneAudio.volume = 1F;
+            // droneAudio.pitch = Mathf.Lerp(droneAudio.pitch, 1f, 5f * Time.deltaTime);
+            // droneAudio.volume = Mathf.Lerp(droneAudio.volume, 1f, 5f * Time.deltaTime);
         }
         else{
-            droneAudio.pitch = 1F;
-            droneAudio.volume = 0F;
+            droneAudio.pitch = Mathf.Lerp(droneAudio.pitch, 0.5f, 5f * Time.deltaTime);
+            droneAudio.volume = Mathf.Lerp(droneAudio.volume, 0f, 5f * Time.deltaTime);
         }
 
         //* MANTAIN UPRIGHT        
