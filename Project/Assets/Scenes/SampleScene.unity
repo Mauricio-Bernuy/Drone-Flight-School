@@ -8401,7 +8401,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &972360134
 Transform:
   m_ObjectHideFlags: 0
@@ -8411,7 +8411,7 @@ Transform:
   m_GameObject: {fileID: 972360133}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -13.83, y: 12.39, z: -52.63}
+  m_LocalPosition: {x: -13.83, y: 12.106, z: -52.63}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -16139,7 +16139,7 @@ Transform:
   m_GameObject: {fileID: 1740570829}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -14.393, y: 13.21, z: -51.528}
+  m_LocalPosition: {x: -14.136, y: 13.21, z: -51.27}
   m_LocalScale: {x: 0.19567, y: 0.19567, z: 0.19567}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -17791,17 +17791,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1fb753e539765741924e283be1400a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 10
+  rotationSpeed: 10
   cForce: {fileID: 0}
   forcedir: {x: 0, y: 0, z: 0}
   forcedir_cp: {x: 0, y: 0, z: 0}
-  factorDeFrenado: 0.95
-  restauration_speed: 1000
-  fuerzaDeFrenado: 10
-  fuerzadetorque: 20
-  precision: 0.01
-  aceleracion: 6
-  frenado: 10
+  elevationSpeed: 20
+  movementAcceleration: 6
   uprightStrength: 10
   turbulence: 0.1
   angularTurbulence: 0
@@ -17927,7 +17922,7 @@ MonoBehaviour:
   _pointableElement: {fileID: 1900988231}
   _rigidbody: {fileID: 1900988228}
   _grabSource: {fileID: 0}
-  _useClosestPointAsGrabSource: 1
+  _useClosestPointAsGrabSource: 0
   _releaseDistance: 0
   _resetGrabOnGrabsUpdated: 1
   _physicsGrabbable: {fileID: 0}

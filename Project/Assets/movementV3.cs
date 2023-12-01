@@ -14,17 +14,12 @@ using System.Threading.Tasks;
 
 public class MoveObjectV3 : MonoBehaviour
 {
-    public float speed = 5f;
+    public float rotationSpeed = 5f;
     public ConstantForce cForce;
     public Vector3 forcedir,forcedir_cp;
-    public float factorDeFrenado = 0.95f; // Ajusta el factor de frenado según tus necesidades
     private Rigidbody rb;
-    public int restauration_speed = 1000;
-    public float fuerzaDeFrenado = 10.0f; // Ajusta la fuerza de frenado según tus necesidades
-    public float fuerzadetorque = 20f;
-    public float precision = 0.01f;
-    public float aceleracion = 1.0f;
-    public float frenado = 10.0f;
+    public float elevationSpeed = 20f;
+    public float movementAcceleration = 1.0f;
 
     public float uprightStrength = 10.0f;
     public float turbulence = 0.05f;
@@ -50,6 +45,7 @@ public class MoveObjectV3 : MonoBehaviour
     public GrabInteractor GrabInteractorR;
     public GrabInteractable target;
     private GrabInteractable droneTarget;
+
     public bool grabbedL = false;
     public bool grabbedR = false;
 
@@ -107,7 +103,7 @@ public class MoveObjectV3 : MonoBehaviour
         if (collision.relativeVelocity.magnitude > 2)
             droneHit.Play();
         
-        if (droneTarget != GrabInteractorL.SelectedInteractable || droneTarget != GrabInteractorR.SelectedInteractable){
+        if (!(droneTarget == GrabInteractorL.SelectedInteractable || droneTarget == GrabInteractorR.SelectedInteractable)){
             if (collision.relativeVelocity.magnitude > 10){
                 droneHardHit.Play();
                 turbulence += 0.2f;
@@ -135,7 +131,16 @@ public class MoveObjectV3 : MonoBehaviour
         else 
             grabbedR = false;
 
-        //* CHECK IF HOLDING DRONE AND FIX
+        //* CHECK IF HOLDING DRONE 
+        if (droneTarget == GrabInteractorL.SelectedInteractable || droneTarget == GrabInteractorR.SelectedInteractable){
+            rb.useGravity = false;
+        
+        }
+        else{
+            rb.useGravity = true;
+        }
+
+        //* CHECK IF HOLDING DRONE WITH 2 HANDS AND FIX
         if (droneTarget == GrabInteractorL.SelectedInteractable && droneTarget == GrabInteractorR.SelectedInteractable){
             if (turbulence != 0.1f && angularTurbulence != 0f){
                 turbulence = 0.1f;
@@ -220,7 +225,7 @@ public class MoveObjectV3 : MonoBehaviour
                 if (OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick) != new Vector2(0f,0f)){
                     Vector2 val = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
                     rb.angularDrag = prevAngularDrag;       
-                    rb.AddTorque(Vector3.up * speed * 100 * val.x * Math.Abs(val.x) * Time.deltaTime); // al cuadrado
+                    rb.AddTorque(Vector3.up * rotationSpeed * 100 * val.x * Math.Abs(val.x) * Time.deltaTime); // al cuadrado
 
                     // fans
                     animFL.speed += val.x; 
@@ -237,7 +242,7 @@ public class MoveObjectV3 : MonoBehaviour
                 if (Math.Abs(OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick).y) != 0.5){
                     Vector2 val = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
                     forcedir_cp = forcedir;
-                    forcedir_cp.y = forcedir.y + fuerzadetorque * val.y * Math.Abs(val.y) * Math.Abs(val.y) * Math.Abs(val.y);
+                    forcedir_cp.y = forcedir.y + elevationSpeed * val.y * Math.Abs(val.y) * Math.Abs(val.y) * Math.Abs(val.y);
                     cForce.force = forcedir_cp;
 
                     // fans
@@ -264,10 +269,10 @@ public class MoveObjectV3 : MonoBehaviour
 
                     if (Mathf.Abs(velocidadXZ) < 10){   
                         Vector3 aux = new Vector3(velocidadX,0,-velocidadZ);
-                        rb.AddForce( aux* aceleracion *val.y, ForceMode.Force);
+                        rb.AddForce( aux * movementAcceleration * val.y * 2f, ForceMode.Force);
                     }
 
-                    rb.AddRelativeTorque(new Vector3(0, 0, 2f)*val.y);
+                    rb.AddRelativeTorque(new Vector3(0, 0, 2f) * val.y);
 
                     // fans
                     animFL.speed -= val.y; 
@@ -290,7 +295,7 @@ public class MoveObjectV3 : MonoBehaviour
 
                     if (Mathf.Abs(velocidadXZ) < 10){   
                         Vector3 aux = new Vector3(velocidadX,0,velocidadZ);
-                        rb.AddForce( aux* aceleracion * val.x, ForceMode.Force);
+                        rb.AddForce( aux* movementAcceleration * val.x * 2f, ForceMode.Force);
                     }
                     rb.AddRelativeTorque(new Vector3(2f, 0, 0)*val.x);
 
@@ -307,40 +312,39 @@ public class MoveObjectV3 : MonoBehaviour
         if (droneOn){
             //ROTACION
             if (Input.GetKey(KeyCode.E)){
-                // transform.Rotate(Vector3.up * speed*10  * Time.deltaTime);
                 rb.angularDrag = prevAngularDrag;       
-                rb.AddTorque(Vector3.up * speed * 100  * Time.deltaTime);
+                rb.AddTorque(Vector3.up * rotationSpeed * 100  * Time.deltaTime);
             }
 
             if (Input.GetKey(KeyCode.Q)){
                 rb.angularDrag = prevAngularDrag;       
-                rb.AddTorque(-Vector3.up * speed * 100  * Time.deltaTime);
+                rb.AddTorque(-Vector3.up * rotationSpeed * 100  * Time.deltaTime);
             }
             if (Input.GetKeyUp(KeyCode.E) || Input.GetKeyUp(KeyCode.Q) ){ 
-                    StartCoroutine(AngularDecelerate());    
+                StartCoroutine(AngularDecelerate());    
             }
 
             //ELEVACION +
             if (Input.GetKeyDown("space")){
                 forcedir_cp = forcedir;
-                forcedir_cp.y = forcedir.y + fuerzadetorque ;
+                forcedir_cp.y = forcedir.y + elevationSpeed;
                 cForce.force = forcedir_cp;
             }
             if (Input.GetKeyUp("space")){
                 forcedir_cp = forcedir;
-                forcedir_cp.y = forcedir.y - fuerzadetorque ;
+                forcedir_cp.y = forcedir.y - elevationSpeed;
                 cForce.force = forcedir;
             }
 
             //ELEVACION -
             if (Input.GetKeyDown("left ctrl")){
                 forcedir_cp = forcedir;
-                forcedir_cp.y = forcedir.y - fuerzadetorque ;
+                forcedir_cp.y = forcedir.y - elevationSpeed;
                 cForce.force = forcedir_cp;
             }
             if (Input.GetKeyUp("left ctrl")){
                 forcedir_cp = forcedir;
-                forcedir_cp.y = forcedir.y + fuerzadetorque ;
+                forcedir_cp.y = forcedir.y + elevationSpeed;
                 cForce.force = forcedir;
             }
 
@@ -356,7 +360,7 @@ public class MoveObjectV3 : MonoBehaviour
 
                 if (Mathf.Abs(velocidadXZ) < 10){   
                     Vector3 aux = new Vector3(velocidadX,0,-velocidadZ);
-                    rb.AddForce( aux* aceleracion, ForceMode.Force);
+                    rb.AddForce( aux* movementAcceleration, ForceMode.Force);
                 }
 
                 rb.AddRelativeTorque(new Vector3(0, 0, 2f)*1f);
@@ -374,7 +378,7 @@ public class MoveObjectV3 : MonoBehaviour
 
                 if (Mathf.Abs(velocidadXZ) < 10){   
                     Vector3 aux = new Vector3(velocidadX,0,-velocidadZ);
-                    rb.AddForce( aux* aceleracion, ForceMode.Force);
+                    rb.AddForce( aux* movementAcceleration, ForceMode.Force);
                 }
 
                 rb.AddRelativeTorque(new Vector3(0, 0, -2f)*1f);
@@ -392,7 +396,7 @@ public class MoveObjectV3 : MonoBehaviour
 
                 if (Mathf.Abs(velocidadXZ) < 10){   
                     Vector3 aux = new Vector3(velocidadX,0,velocidadZ);
-                    rb.AddForce( aux* aceleracion, ForceMode.Force);
+                    rb.AddForce( aux* movementAcceleration, ForceMode.Force);
                 }
                 rb.AddRelativeTorque(new Vector3(2f, 0, 0)*1f);
             }
@@ -409,7 +413,7 @@ public class MoveObjectV3 : MonoBehaviour
 
                 if (Mathf.Abs(velocidadXZ) < 10){   
                     Vector3 aux = new Vector3(velocidadX,0,velocidadZ);
-                    rb.AddForce( aux* aceleracion, ForceMode.Force);
+                    rb.AddForce( aux* movementAcceleration, ForceMode.Force);
                 }
                 rb.AddRelativeTorque(new Vector3(-2f, 0, 0)*1f);
             }
