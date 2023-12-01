@@ -49,6 +49,7 @@ public class MoveObjectV3 : MonoBehaviour
     public GrabInteractor GrabInteractorL;
     public GrabInteractor GrabInteractorR;
     public GrabInteractable target;
+    private GrabInteractable droneTarget;
     public bool grabbedL = false;
     public bool grabbedR = false;
 
@@ -70,6 +71,7 @@ public class MoveObjectV3 : MonoBehaviour
         cForce.force = forcedir;
         rb = GetComponent<Rigidbody>();
         prevAngularDrag = rb.angularDrag;      
+        droneTarget = transform.GetComponent<GrabInteractable>();
 
         animFL = transform.Find("drone/Fans/fan.FL").GetComponent<Animator>();
         animFR = transform.Find("drone/Fans/fan.FR").GetComponent<Animator>();
@@ -104,11 +106,13 @@ public class MoveObjectV3 : MonoBehaviour
     {
         if (collision.relativeVelocity.magnitude > 2)
             droneHit.Play();
-
-        if (collision.relativeVelocity.magnitude > 10){
-            droneHardHit.Play();
-            turbulence += 0.2f;
-            angularTurbulence += 0.1f;
+        
+        if (droneTarget != GrabInteractorL.SelectedInteractable || droneTarget != GrabInteractorR.SelectedInteractable){
+            if (collision.relativeVelocity.magnitude > 10){
+                droneHardHit.Play();
+                turbulence += 0.2f;
+                angularTurbulence += 0.1f;
+            }
         }
     }
 
@@ -130,6 +134,16 @@ public class MoveObjectV3 : MonoBehaviour
             grabbedR = true;
         else 
             grabbedR = false;
+
+        //* CHECK IF HOLDING DRONE AND FIX
+        if (droneTarget == GrabInteractorL.SelectedInteractable && droneTarget == GrabInteractorR.SelectedInteractable){
+            if (turbulence != 0.1f && angularTurbulence != 0f){
+                turbulence = 0.1f;
+                angularTurbulence = 0f;
+                droneBeep.pitch = 2F;
+                droneBeep.Play(0);
+            }
+        }
         
         //* TOGGLE ON
         if (Input.GetKeyDown(KeyCode.F) || (grabbedR && OVRInput.GetDown(OVRInput.Button.One))){
