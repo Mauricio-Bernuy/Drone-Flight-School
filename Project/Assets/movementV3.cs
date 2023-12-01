@@ -47,6 +47,15 @@ public class MoveObjectV3 : MonoBehaviour
     public bool grabbedL = false;
     public bool grabbedR = false;
 
+    public AudioSource droneAudio;
+    public AudioSource droneBeep;
+
+    public float rotAudio = 0;
+    public float heightAudio = 0;
+    public float FBAudio = 0;
+    public float LRAudio = 0;
+
+
 
     void Start(){
         cForce = GetComponent<ConstantForce>();
@@ -59,6 +68,11 @@ public class MoveObjectV3 : MonoBehaviour
         animFR = transform.Find("drone/Fans/fan.FR").GetComponent<Animator>();
         animBL = transform.Find("drone/Fans/fan.BL").GetComponent<Animator>();
         animBR = transform.Find("drone/Fans/fan.BR").GetComponent<Animator>();
+
+        AudioSource[] audioSources = transform.GetComponents<AudioSource>();
+        droneAudio = audioSources[0];
+        droneBeep = audioSources[1];
+
     }
 
     public IEnumerator AngularDecelerate()
@@ -107,7 +121,7 @@ public class MoveObjectV3 : MonoBehaviour
             }
         }
         
-        // BASE FAN SPEED
+        //* BASE FAN SPEED
         if(droneOn){
             animFL.speed = 2F; 
             animFR.speed = 2F; 
@@ -121,6 +135,15 @@ public class MoveObjectV3 : MonoBehaviour
             animBR.speed = 0F; 
         }
 
+        if(droneOn){
+            droneAudio.pitch = 1F;
+            droneAudio.volume = 1F;
+        }
+        else{
+            droneAudio.pitch = 1F;
+            droneAudio.volume = 0F;
+        }
+
         //* MANTAIN UPRIGHT        
         if (droneOn){
             var rot = Quaternion.FromToRotation(transform.up, Vector3.up);
@@ -129,6 +152,23 @@ public class MoveObjectV3 : MonoBehaviour
 
         //* CONTROLLER CONTROLS
         if (droneOn){
+            // AUDIO
+            if (grabbedL || grabbedR){
+                Vector2 valL = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
+                rotAudio = (float)Math.Round(Mathf.Lerp(rotAudio, Mathf.Abs(valL.x), 5f * Time.deltaTime),8);
+                heightAudio = (float)Math.Round(Mathf.Lerp(heightAudio, Mathf.Abs(valL.y), 5f * Time.deltaTime),8);
+                // rotAudio = Mathf.Abs(valL.x);
+                // heightAudio = Mathf.Abs(valL.y);
+
+                Vector2 valR = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
+                LRAudio = (float)Math.Round(Mathf.Lerp(LRAudio, Mathf.Abs(valR.x), 5f * Time.deltaTime),8);
+                FBAudio = (float)Math.Round(Mathf.Lerp(FBAudio, Mathf.Abs(valR.y), 5f * Time.deltaTime),8);
+                // LRAudio = Mathf.Abs(valR.x);
+                // FBAudio = Mathf.Abs(valR.y);
+
+                droneAudio.pitch += rotAudio + heightAudio + FBAudio + LRAudio;
+            }
+            
             if (grabbedL){
                 // ROTATION CONTROLLER
                 if (OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick) != new Vector2(0f,0f)){
@@ -141,10 +181,18 @@ public class MoveObjectV3 : MonoBehaviour
                     animFR.speed -= val.x; 
                     animBL.speed -= val.x; 
                     animBR.speed += val.x; 
+
+                    // pitch
+                    // droneAudio.pitch += Mathf.Abs(val.x);
+                    // rotAudio = Mathf.Lerp(rotAudio, Mathf.Abs(val.x), 5f * Time.deltaTime);
+                    
+
                 }
 
                 if (OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick) == new Vector2(0f,0f)){ 
                     StartCoroutine(AngularDecelerate());    
+                    // Vector2 val = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
+                    // rotAudio = Mathf.Lerp(rotAudio, Mathf.Abs(val.x), 5f * Time.deltaTime);
                 }
 
                 // ELEVATION CONTROLLER
@@ -159,6 +207,10 @@ public class MoveObjectV3 : MonoBehaviour
                     animFR.speed += val.y; 
                     animBL.speed += val.y; 
                     animBR.speed += val.y; 
+
+                    // pitch
+                    // droneAudio.pitch += Mathf.Abs(val.y);
+                    // heightAudio = Mathf.Lerp(heightAudio, Mathf.Abs(val.y), 5f * Time.deltaTime);
 
                 }
             } 
@@ -188,6 +240,11 @@ public class MoveObjectV3 : MonoBehaviour
                     animFR.speed -= val.y; 
                     animBL.speed += val.y; 
                     animBR.speed += val.y; 
+
+                    // pitch
+                    // droneAudio.pitch += Mathf.Abs(val.y);
+                    // FBAudio = Mathf.Lerp(FBAudio, Mathf.Abs(val.y), 5f * Time.deltaTime);
+
                 }
 
                 // LEFT RIGHT CONTROLLER
@@ -213,10 +270,14 @@ public class MoveObjectV3 : MonoBehaviour
                     animFR.speed -= val.x; 
                     animBL.speed += val.x; 
                     animBR.speed -= val.x; 
+
+                    // pitch
+                    // droneAudio.pitch += Mathf.Abs(val.x);
+                    // LRAudio = Mathf.Lerp(LRAudio, Mathf.Abs(val.x), 5f * Time.deltaTime);
                 }
             }
         }
-
+        
         //* KEYBOARD CONTROLS
         if (droneOn){
             //ROTACION
@@ -333,6 +394,7 @@ public class MoveObjectV3 : MonoBehaviour
         speedFR = animFR.speed;
         speedBL = animBL.speed;
         speedBR = animBR.speed;
+
     }
 }
 
