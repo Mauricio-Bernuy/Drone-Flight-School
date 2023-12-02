@@ -31,9 +31,11 @@ public class ImageChanger : MonoBehaviour
         imageComponent.sprite = images[currentImageIndex];
     }
     public void ChangeDroneId(){
-        GameManager.manager.SetDroneId(currentImageIndex);
+        MenuController menu = FindObjectOfType<MenuController>();
+        menu.MenuSetDroneId(currentImageIndex);
     }
     public void ChangeMapId(){
-        GameManager.manager.SetMapId(currentImageIndex+1);
+        MenuController menu = FindObjectOfType<MenuController>();
+        menu.MenuSetMapId(currentImageIndex+1);
     }
 }
