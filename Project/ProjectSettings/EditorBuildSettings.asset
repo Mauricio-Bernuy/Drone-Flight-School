@@ -13,7 +13,7 @@ EditorBuildSettings:
     guid: a828eefe1f43cc740945232cd558d7f6
   - enabled: 1
     path: Assets/Scenes/MAPA2.unity
-    guid: 7db1448888a64d744af563bdee7010d3
+    guid: c16cb0fed2882124fbd9c8025c289fc7
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 878f5ba33ba5fc2429ae18dd394a0ad7, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: de50f6ab8bf0c4c46a628c1a60963b66, type: 2}
