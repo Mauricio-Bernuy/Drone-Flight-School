@@ -12,8 +12,11 @@ using System.Threading.Tasks;
 
 
 
+
+
 public class MoveObjectV3 : MonoBehaviour
 {
+    public int droneId = 1;
     public float rotationSpeed = 5f;
     public ConstantForce cForce;
     public Vector3 forcedir,forcedir_cp;
@@ -65,6 +68,53 @@ public class MoveObjectV3 : MonoBehaviour
     private bool checkedFinalCrash = false;
 
     void Start(){
+        //* Setup drone config
+        GameObject droneObj = transform.Find("drone").gameObject;
+        var droneRenderer = droneObj.GetComponent<Renderer>();
+        var mats = droneRenderer.materials;
+        droneObj = transform.Find("drone/Fans").gameObject;
+        droneRenderer = droneObj.GetComponent<Renderer>();
+        var mats2 = droneRenderer.materials;
+
+        try{
+            droneId = GameManager.manager.GetDroneId();
+        } 
+        catch{
+            Debug.Log("defaulting to drone 1");
+        }
+        switch(droneId){
+        case 0:
+            rotationSpeed = 5f;
+            elevationSpeed = 10f;
+            movementAcceleration = 2f;
+            mats[0].SetColor("_Color", Color.red);
+            mats[1].SetColor("_Color", Color.white);
+            mats2[0].SetColor("_Color", Color.red);
+            mats2[1].SetColor("_Color", Color.white);
+            break;
+        case 1:
+            rotationSpeed = 10f;
+            elevationSpeed = 20f;
+            movementAcceleration = 6f;
+            mats[0].SetColor("_Color", Color.green);
+            mats[1].SetColor("_Color", Color.white);
+            mats2[0].SetColor("_Color", Color.green);
+            mats2[1].SetColor("_Color", Color.white);
+            break;
+        case 2:
+            rotationSpeed = 10f;
+            elevationSpeed = 25f;
+            movementAcceleration = 6f;
+            gravConst = 0;
+            mats[0].SetColor("_Color", Color.black);
+            mats[1].SetColor("_Color", Color.green);
+            mats2[0].SetColor("_Color", Color.black);
+            mats2[1].SetColor("_Color", Color.green);
+            break;
+        default:
+            break;
+        }
+
         cForce = GetComponent<ConstantForce>();
         forcedir = new Vector3(0, gravConst, 0);
         cForce.force = forcedir;
