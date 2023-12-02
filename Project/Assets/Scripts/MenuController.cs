@@ -7,6 +7,6 @@ public class MenuController : MonoBehaviour
 {
     // Start is called before the first frame update
     public void StartBtn(){
-        Debug.Log(GameManager.manager.GetMapId());
+        SceneManager.LoadScene(GameManager.manager.GetMapId());
     }
 }

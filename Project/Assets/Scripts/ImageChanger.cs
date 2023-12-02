@@ -34,6 +34,6 @@ public class ImageChanger : MonoBehaviour
         GameManager.manager.SetDroneId(currentImageIndex);
     }
     public void ChangeMapId(){
-        GameManager.manager.SetMapId(currentImageIndex);
+        GameManager.manager.SetMapId(currentImageIndex+1);
     }
 }
